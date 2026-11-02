@@ -79,15 +79,40 @@
 
     <!-- View: Tuition Teacher Dashboard -->
     <div id="teacherDashboard" style="display: none;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
         <div>
-          <h2>Teacher Management Portal</h2>
-          <p style="color: var(--text-muted);">Manage schools, grades, student fee charts, and SMS alerts.</p>
+          <h1 style="font-size: 2rem; font-weight: 800; letter-spacing: -0.5px;">Fees Management</h1>
+          <p style="color: var(--text-secondary); margin-top: 0.25rem;">Manage and track tuition fees with ease.</p>
         </div>
-        <div style="display: flex; gap: 0.75rem;">
+        <div style="display: flex; gap: 0.85rem; align-items: center;">
           <button class="btn btn-outline" onclick="openSmsLogsModal()">📱 SMS History</button>
-          <button class="btn btn-outline" onclick="openSettingsModal()">⚙️ UPI & Settings</button>
+          <button class="btn btn-outline" onclick="openSettingsModal()">⚙️ Settings</button>
           <button class="btn btn-primary" onclick="openAddStudentModal()">+ Add New Student</button>
+        </div>
+      </div>
+
+      <!-- Overview Stats Cards (Matching Theme Image) -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-info">
+            <span class="stat-label">Total Students</span>
+            <span class="stat-value" id="statTotalStudents">0</span>
+          </div>
+          <div class="stat-icon-wrap icon-blue">👥</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-info">
+            <span class="stat-label">Active Classes</span>
+            <span class="stat-value" id="statActiveClasses">0</span>
+          </div>
+          <div class="stat-icon-wrap icon-green">📚</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-info">
+            <span class="stat-label">Affiliated Schools</span>
+            <span class="stat-value" id="statTotalSchools">0</span>
+          </div>
+          <div class="stat-icon-wrap icon-orange">🏫</div>
         </div>
       </div>
 
@@ -113,9 +138,9 @@
 
       <!-- Students List View -->
       <div class="card" id="studentsListCard">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-          <h3 id="studentsCountHeader">Students (0)</h3>
-          <span style="font-size: 0.85rem; color: var(--text-muted);">Click "View Fee Chart" to see monthly paid/unpaid status</span>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+          <h3 id="studentsCountHeader" style="font-size: 1.25rem; font-weight: 700;">Students (0)</h3>
+          <span style="font-size: 0.85rem; color: var(--text-muted);">Click "View Fee Chart" to see monthly status</span>
         </div>
         <div style="overflow-x: auto;">
           <table class="data-table">
@@ -125,7 +150,6 @@
                 <th>Student Name</th>
                 <th>School</th>
                 <th>Class</th>
-                <th>Monthly Fee</th>
                 <th>Parent Name & Phone</th>
                 <th>Personal Payment Link</th>
                 <th>Action</th>
@@ -186,20 +210,25 @@
       <!-- Fee Statistics Overview Cards -->
       <div class="stats-grid" style="margin-top: 1.5rem;">
         <div class="stat-card">
-          <div class="stat-label">Monthly Fee</div>
-          <div class="stat-value chart-stat-monthly">₹0</div>
-        </div>
-        <div class="stat-card" style="border-left: 4px solid var(--success);">
-          <div class="stat-label">Months Paid</div>
-          <div class="stat-value chart-stat-paid" style="color: var(--success);">0 / 12</div>
-        </div>
-        <div class="stat-card" style="border-left: 4px solid var(--danger);">
-          <div class="stat-label">Months Due</div>
-          <div class="stat-value chart-stat-due" style="color: var(--danger);">0 / 12</div>
+          <div class="stat-info">
+            <span class="stat-label">Academic Year</span>
+            <span class="stat-value" style="font-size: 1.5rem;">2026</span>
+          </div>
+          <div class="stat-icon-wrap icon-blue">📅</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Total Amount Paid</div>
-          <div class="stat-value chart-stat-total-paid" style="color: var(--primary);">₹0</div>
+          <div class="stat-info">
+            <span class="stat-label">Months Paid</span>
+            <span class="stat-value chart-stat-paid" style="color: #34d399;">0 / 12</span>
+          </div>
+          <div class="stat-icon-wrap icon-green">✓</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-info">
+            <span class="stat-label">Months Pending</span>
+            <span class="stat-value chart-stat-due" style="color: #fbbf24;">0 / 12</span>
+          </div>
+          <div class="stat-icon-wrap icon-orange">⏳</div>
         </div>
       </div>
 
@@ -229,10 +258,9 @@
 
       <!-- UPI QR Code & Direct Deep Link -->
       <div class="upi-box">
-        <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted);">SCAN VIA GPAY / PHONEPE / PAYTM</span>
+        <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); letter-spacing: 0.5px;">SCAN VIA GPAY / PHONEPE / PAYTM</span>
         <img id="upiQrCodeImg" class="qr-image" src="" alt="UPI QR Code">
-        <div style="font-weight: 700; font-size: 1.25rem; color: var(--primary);" id="payModalAmountText">₹0</div>
-        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">UPI ID: <span id="payModalUpiId"></span></div>
+        <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.5rem;">UPI ID: <span id="payModalUpiId" style="color: #fff; font-weight: 600;"></span></div>
         
         <div style="margin-top: 1.25rem;">
           <a id="upiDeepLinkBtn" href="#" class="btn btn-gpay" style="width: 100%;">
@@ -295,10 +323,6 @@
           <select id="newStuClass" class="form-select" required>
             <option value="">Select Class</option>
           </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Monthly Fee (₹)</label>
-          <input type="number" id="newStuFee" class="form-control" value="1500" required>
         </div>
         <div class="form-group">
           <label class="form-label">Parent's Name</label>

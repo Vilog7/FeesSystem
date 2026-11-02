@@ -40,22 +40,28 @@
     <div class="card" id="studentHeaderCard">
       <div style="text-align: center;">
         <span class="badge badge-parent" style="font-size: 0.8rem; margin-bottom: 0.5rem; display: inline-block;">Personal Fee Payment Link</span>
-        <h2 id="payStudentName" style="color: var(--primary); margin-top: 0.25rem;">Loading Student...</h2>
-        <p id="payStudentDetails" style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.25rem;">Fetching student details...</p>
+        <h2 id="payStudentName" style="color: #fff; margin-top: 0.25rem; font-size: 1.75rem; font-weight: 800;">Loading Student...</h2>
+        <p id="payStudentDetails" style="color: var(--text-secondary); font-size: 0.95rem; margin-top: 0.35rem;">Fetching student details...</p>
       </div>
 
       <div class="stats-grid" style="margin-top: 1.5rem; margin-bottom: 0;">
         <div class="stat-card" style="text-align: center;">
-          <div class="stat-label">Monthly Tuition Fee</div>
-          <div class="stat-value" id="payMonthlyRate" style="font-size: 1.5rem;">₹0</div>
+          <div class="stat-info" style="width: 100%;">
+            <div class="stat-label">Academic Year</div>
+            <div class="stat-value" style="font-size: 1.5rem;">2026</div>
+          </div>
         </div>
-        <div class="stat-card" style="text-align: center; border-left: 4px solid var(--success);">
-          <div class="stat-label">Total Paid</div>
-          <div class="stat-value" id="payTotalPaidCount" style="color: var(--success); font-size: 1.5rem;">0 Months</div>
+        <div class="stat-card" style="text-align: center;">
+          <div class="stat-info" style="width: 100%;">
+            <div class="stat-label">Total Paid</div>
+            <div class="stat-value" id="payTotalPaidCount" style="color: #34d399; font-size: 1.5rem;">0 Months</div>
+          </div>
         </div>
-        <div class="stat-card" style="text-align: center; border-left: 4px solid var(--danger);">
-          <div class="stat-label">Pending Due</div>
-          <div class="stat-value" id="payPendingCount" style="color: var(--danger); font-size: 1.5rem;">0 Months</div>
+        <div class="stat-card" style="text-align: center;">
+          <div class="stat-info" style="width: 100%;">
+            <div class="stat-label">Pending Due</div>
+            <div class="stat-value" id="payPendingCount" style="color: #fbbf24; font-size: 1.5rem;">0 Months</div>
+          </div>
         </div>
       </div>
     </div>
@@ -70,15 +76,14 @@
       </h3>
 
       <div class="upi-box" style="margin-top: 1.25rem;">
-        <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted);">SCAN WITH ANY UPI APP (GPAY, PHONEPE, PAYTM)</div>
+        <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); letter-spacing: 0.5px;">SCAN WITH ANY UPI APP (GPAY, PHONEPE, PAYTM)</div>
         <img id="directUpiQr" class="qr-image" src="" alt="UPI QR Code">
         
-        <div style="font-size: 1.5rem; font-weight: 800; color: var(--text-main);" id="directPayAmountText">₹0</div>
-        <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;">
-          Paying for: <b id="directMonthLabel">-</b>
+        <div style="font-size: 1rem; color: var(--text-secondary); margin-top: 0.5rem;">
+          Paying for: <b id="directMonthLabel" style="color: #fff;">-</b>
         </div>
-        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">
-          UPI ID: <span id="directUpiIdText">-</span>
+        <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;">
+          UPI ID: <span id="directUpiIdText" style="color: #a5b4fc;">-</span>
         </div>
 
         <div style="margin-top: 1.25rem;">

@@ -42,7 +42,6 @@ function renderStudentHeader() {
   document.getElementById('payStudentDetails').textContent = 
     `${stu.school_name} • ${stu.class_name} • Code: ${stu.student_code} • Parent: ${stu.parent_name}`;
 
-  document.getElementById('payMonthlyRate').textContent = `₹${stu.monthly_fee.toLocaleString()}`;
   document.getElementById('payTotalPaidCount').textContent = `${feeChartData.summary.paid_months} / 12`;
   document.getElementById('payPendingCount').textContent = `${feeChartData.summary.unpaid_months} / 12`;
 }
@@ -88,7 +87,6 @@ function updateCheckoutBox() {
   const upi = feeChartData.upi_settings;
 
   document.getElementById('directMonthLabel').textContent = `${targetMonth.month_name} 2026`;
-  document.getElementById('directPayAmountText').textContent = `₹${targetMonth.amount.toLocaleString()}`;
   document.getElementById('directUpiIdText').textContent = upi.tuition_upi_id;
 
   // Build UPI URI (Supports teacher phone number VPA e.g. +91xxxxxxxxxx@upi or direct ID)
@@ -99,7 +97,7 @@ function updateCheckoutBox() {
   const payeeVpa = encodeURIComponent(vpa);
   const payeeName = encodeURIComponent(upi.tuition_name || 'Tuition Academy');
   const note = encodeURIComponent(`Fees ${stu.student_code} ${targetMonth.month_name}`);
-  const upiUri = `upi://pay?pa=${payeeVpa}&pn=${payeeName}&am=${targetMonth.amount}&tn=${note}&cu=INR`;
+  const upiUri = `upi://pay?pa=${payeeVpa}&pn=${payeeName}&tn=${note}&cu=INR`;
 
   // Deep Link button
   document.getElementById('directGPayBtn').href = upiUri;
@@ -134,24 +132,23 @@ function renderDirectFeeChart() {
       <div>
         <div class="month-title">
           <span>${escapeHtml(m.month_name)}</span>
-          <span class="status-badge ${isPaid ? 'paid' : 'unpaid'}">
-            ${isPaid ? '✓ PAID' : '✕ UNPAID'}
+          <span class="status-pill ${isPaid ? 'paid' : 'pending'}">
+            ${isPaid ? '✓ Paid' : '⏳ Pending'}
           </span>
         </div>
-        <div class="month-amount">₹${m.amount.toLocaleString()}</div>
         ${isPaid ? `
-          <div style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.4;">
-            <div>Mode: <b>${escapeHtml(m.payment_mode || 'UPI')}</b></div>
-            <div>Receipt: <b>${escapeHtml(m.receipt_no || '-')}</b></div>
+          <div style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.5; margin-top: 0.85rem;">
+            <div>Mode: <b style="color: #cbd5e1;">${escapeHtml(m.payment_mode || 'UPI')}</b></div>
+            <div>Receipt: <b style="color: #cbd5e1;">${escapeHtml(m.receipt_no || '-')}</b></div>
           </div>
         ` : `
-          <div style="font-size: 0.8rem; color: #b91c1c;">
+          <div style="font-size: 0.82rem; color: #fbbf24; margin-top: 0.85rem;">
             Payment pending
           </div>
         `}
       </div>
-      <div style="margin-top: 1rem;">
-        <button class="btn ${isPaid ? 'btn-outline' : 'btn-success'}" style="width: 100%; font-size: 0.8rem; padding: 0.4rem;" onclick="selectMonthForPayment(${m.month_index})">
+      <div style="margin-top: 1.25rem;">
+        <button class="btn ${isPaid ? 'btn-outline' : 'btn-success'}" style="width: 100%; font-size: 0.82rem; padding: 0.45rem;" onclick="selectMonthForPayment(${m.month_index})">
           ${isPaid ? 'View Details' : 'Pay This Month'}
         </button>
       </div>

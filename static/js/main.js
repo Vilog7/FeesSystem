@@ -260,10 +260,23 @@ function renderStudentsTable(students) {
   const tbody = document.getElementById('studentsTableBody');
   const countHeader = document.getElementById('studentsCountHeader');
   countHeader.textContent = `Students (${students.length})`;
+  
+  // Update overview stats
+  const statStudents = document.getElementById('statTotalStudents');
+  const statClasses = document.getElementById('statActiveClasses');
+  const statSchools = document.getElementById('statTotalSchools');
+  if (statStudents) statStudents.textContent = students.length;
+  if (statSchools) statSchools.textContent = appHierarchy.length;
+  if (statClasses) {
+    let classCount = 0;
+    appHierarchy.forEach(s => { classCount += (s.classes ? s.classes.length : 0); });
+    statClasses.textContent = classCount;
+  }
+
   tbody.innerHTML = '';
 
   if (students.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 2rem; color: var(--text-muted);">No students found matching current filter.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 2.5rem; color: var(--text-muted);">No students registered yet. Click "+ Add New Student" or let parents sign up.</td></tr>`;
     return;
   }
 
@@ -271,18 +284,17 @@ function renderStudentsTable(students) {
     const personalPayUrl = `${window.location.origin}/pay/${st.student_code}`;
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td><span class="badge" style="background: #e2e8f0; color: #334155;">${escapeHtml(st.student_code)}</span></td>
-      <td><b>${escapeHtml(st.full_name)}</b></td>
-      <td>${escapeHtml(st.school_name)}</td>
-      <td>${escapeHtml(st.class_name)}</td>
-      <td><b>₹${st.monthly_fee.toLocaleString()}</b></td>
+      <td><span class="badge" style="background: rgba(255,255,255,0.06); color: #cbd5e1; border: 1px solid rgba(255,255,255,0.1);">${escapeHtml(st.student_code)}</span></td>
+      <td><b style="color: #fff; font-size: 0.95rem;">${escapeHtml(st.full_name)}</b></td>
+      <td><span style="color: var(--text-secondary);">${escapeHtml(st.school_name)}</span></td>
+      <td><span style="color: var(--text-secondary);">${escapeHtml(st.class_name)}</span></td>
       <td>
-        <div>${escapeHtml(st.parent_name)}</div>
+        <div style="color: #fff;">${escapeHtml(st.parent_name)}</div>
         <small style="color: var(--text-muted);">${escapeHtml(st.parent_phone)}</small>
       </td>
       <td>
         <div style="display: flex; gap: 0.4rem; align-items: center;">
-          <a href="/pay/${st.student_code}" target="_blank" class="btn btn-outline" style="padding: 0.35rem 0.65rem; font-size: 0.8rem;">Open Page ↗</a>
+          <a href="/pay/${st.student_code}" target="_blank" class="btn btn-outline" style="padding: 0.35rem 0.65rem; font-size: 0.8rem;">Open ↗</a>
           <button class="btn btn-outline" style="padding: 0.35rem 0.65rem; font-size: 0.8rem;" onclick="copyToClipboard('${personalPayUrl}')">Copy Link</button>
         </div>
       </td>
@@ -382,10 +394,8 @@ async function renderFeeChart(studentCode, targetElement) {
     clone.querySelector('.student-chart-contact').textContent = `Parent: ${data.student.parent_name} (${data.student.parent_phone})`;
 
     // Fill Stats
-    clone.querySelector('.chart-stat-monthly').textContent = `₹${data.student.monthly_fee.toLocaleString()}`;
     clone.querySelector('.chart-stat-paid').textContent = `${data.summary.paid_months} / 12`;
     clone.querySelector('.chart-stat-due').textContent = `${data.summary.unpaid_months} / 12`;
-    clone.querySelector('.chart-stat-total-paid').textContent = `₹${data.summary.total_paid.toLocaleString()}`;
 
     // Fill 12 Months
     const grid = clone.querySelector('.chart-grid-container');
@@ -398,30 +408,29 @@ async function renderFeeChart(studentCode, targetElement) {
         <div>
           <div class="month-title">
             <span>${escapeHtml(m.month_name)}</span>
-            <span class="status-badge ${isPaid ? 'paid' : 'unpaid'}">
-              ${isPaid ? '✓ PAID' : '✕ UNPAID'}
+            <span class="status-pill ${isPaid ? 'paid' : 'pending'}">
+              ${isPaid ? '✓ Paid' : '⏳ Pending'}
             </span>
           </div>
-          <div class="month-amount">₹${m.amount.toLocaleString()}</div>
           ${isPaid ? `
-            <div style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.4;">
-              <div>Mode: <b>${escapeHtml(m.payment_mode || 'UPI')}</b></div>
-              <div>Receipt: <b>${escapeHtml(m.receipt_no || '-')}</b></div>
-              <div>Date: ${m.paid_at ? m.paid_at.substring(0, 10) : 'Recorded'}</div>
+            <div style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.5; margin-top: 0.85rem;">
+              <div>Payment Mode: <b style="color: #cbd5e1;">${escapeHtml(m.payment_mode || 'UPI')}</b></div>
+              <div>Receipt: <b style="color: #cbd5e1;">${escapeHtml(m.receipt_no || '-')}</b></div>
+              <div>Recorded: ${m.paid_at ? m.paid_at.substring(0, 10) : 'Done'}</div>
             </div>
           ` : `
-            <div style="font-size: 0.8rem; color: #b91c1c; margin-bottom: 0.5rem;">
-              Fee pending for this month
+            <div style="font-size: 0.82rem; color: #fbbf24; margin-top: 0.85rem;">
+              Monthly fee payment pending
             </div>
           `}
         </div>
-        <div style="margin-top: 1rem;">
+        <div style="margin-top: 1.25rem;">
           ${isPaid ? `
-            <button class="btn btn-outline" style="width: 100%; font-size: 0.8rem; padding: 0.4rem;" onclick="showReceiptAlert('${m.receipt_no}', '${data.student.full_name}', '${m.month_name}', ${m.amount})">
+            <button class="btn btn-outline" style="width: 100%; font-size: 0.8rem; padding: 0.45rem;" onclick="showReceiptAlert('${m.receipt_no}', '${data.student.full_name}', '${m.month_name}')">
               📄 View Receipt
             </button>
           ` : `
-            <button class="btn btn-success" style="width: 100%; font-size: 0.85rem; padding: 0.45rem;" onclick="openPaymentModal('${data.student.student_code}', ${m.month_index}, '${m.month_name}', ${m.amount})">
+            <button class="btn btn-success" style="width: 100%; font-size: 0.85rem; padding: 0.5rem;" onclick="openPaymentModal('${data.student.student_code}', ${m.month_index}, '${m.month_name}')">
               💳 Pay Month Fee
             </button>
           `}
@@ -439,8 +448,8 @@ async function renderFeeChart(studentCode, targetElement) {
   }
 }
 
-function showReceiptAlert(recNo, student, month, amount) {
-  alert(`=== TUITION FEE PAYMENT RECEIPT ===\nReceipt No: ${recNo}\nStudent: ${student}\nMonth: ${month} 2026\nAmount: Rs. ${amount}\nStatus: VERIFIED & PAID\nSMS sent to parent & teacher.`);
+function showReceiptAlert(recNo, student, month) {
+  alert(`=== TUITION FEE PAYMENT RECEIPT ===\nReceipt No: ${recNo}\nStudent: ${student}\nMonth: ${month} 2026\nStatus: VERIFIED & PAID\nSMS sent to parent & teacher.`);
 }
 
 function copyPersonalLink() {
@@ -453,7 +462,7 @@ function copyPersonalLink() {
 
 // ---------------- PAYMENT MODAL (UPI & SMS TRIGGER) ----------------
 
-function openPaymentModal(studentCode, monthIndex, monthName, amount) {
+function openPaymentModal(studentCode, monthIndex, monthName) {
   const modal = document.getElementById('paymentModal');
   document.getElementById('payStudentCode').value = studentCode;
   document.getElementById('payMonthIndex').value = monthIndex;
@@ -462,7 +471,6 @@ function openPaymentModal(studentCode, monthIndex, monthName, amount) {
   const upiSettings = currentViewingStudentData ? currentViewingStudentData.upi_settings : {};
 
   document.getElementById('payModalTitle').textContent = `Pay Fees for ${monthName} 2026`;
-  document.getElementById('payModalAmountText').textContent = `₹${amount.toLocaleString()}`;
   document.getElementById('payModalUpiId').textContent = upiSettings.tuition_upi_id || 'tuitionteacher@upi';
 
   document.getElementById('payModalStudentDetails').innerHTML = `
@@ -472,14 +480,13 @@ function openPaymentModal(studentCode, monthIndex, monthName, amount) {
   `;
 
   // Standard UPI URI deep link (Uses Teacher's Phone Number VPA or custom UPI ID)
-  // For phone number VPA in India: <phone>@upi / <phone>@okaxis / <phone>@paytm or upi://pay?pa=...
   let payeeVpa = upiSettings.tuition_upi_id || '9876543210@upi';
   if (upiSettings.teacher_phone && !payeeVpa.includes('@')) {
     payeeVpa = `${upiSettings.teacher_phone}@upi`;
   }
   const payeeName = encodeURIComponent(upiSettings.tuition_name || 'Tuition Academy');
   const note = encodeURIComponent(`Fees ${studentCode} ${monthName}`);
-  const upiUri = `upi://pay?pa=${encodeURIComponent(payeeVpa)}&pn=${payeeName}&am=${amount}&tn=${note}&cu=INR`;
+  const upiUri = `upi://pay?pa=${encodeURIComponent(payeeVpa)}&pn=${payeeName}&tn=${note}&cu=INR`;
 
   // Set GPay / UPI Deep Link button
   document.getElementById('upiDeepLinkBtn').href = upiUri;
