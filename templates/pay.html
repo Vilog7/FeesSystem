@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pay Tuition Fees - Personal Payment Link</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    .pay-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .pay-container {
+      max-width: 650px;
+      margin: 1.5rem auto;
+      padding: 0 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="navbar">
+    <a href="/" class="brand">
+      <div class="brand-icon">₹</div>
+      <div>
+        <span id="navTuitionName">Bright Minds Academy</span>
+        <span style="font-size: 0.75rem; display: block; color: var(--text-muted); font-weight: 500;">Online Student Fee Portal</span>
+      </div>
+    </a>
+    <div>
+      <a href="/" class="btn btn-outline" style="font-size: 0.85rem;">Login to Dashboard</a>
+    </div>
+  </header>
+
+  <main class="pay-container">
+
+    <div class="card" id="studentHeaderCard">
+      <div style="text-align: center;">
+        <span class="badge badge-parent" style="font-size: 0.8rem; margin-bottom: 0.5rem; display: inline-block;">Personal Fee Payment Link</span>
+        <h2 id="payStudentName" style="color: var(--primary); margin-top: 0.25rem;">Loading Student...</h2>
+        <p id="payStudentDetails" style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.25rem;">Fetching student details...</p>
+      </div>
+
+      <div class="stats-grid" style="margin-top: 1.5rem; margin-bottom: 0;">
+        <div class="stat-card" style="text-align: center;">
+          <div class="stat-label">Monthly Tuition Fee</div>
+          <div class="stat-value" id="payMonthlyRate" style="font-size: 1.5rem;">₹0</div>
+        </div>
+        <div class="stat-card" style="text-align: center; border-left: 4px solid var(--success);">
+          <div class="stat-label">Total Paid</div>
+          <div class="stat-value" id="payTotalPaidCount" style="color: var(--success); font-size: 1.5rem;">0 Months</div>
+        </div>
+        <div class="stat-card" style="text-align: center; border-left: 4px solid var(--danger);">
+          <div class="stat-label">Pending Due</div>
+          <div class="stat-value" id="payPendingCount" style="color: var(--danger); font-size: 1.5rem;">0 Months</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Month Checkout Area -->
+    <div class="card" id="activeCheckoutCard" style="border: 2px solid var(--primary-light);">
+      <h3 style="display: flex; align-items: center; justify-content: space-between;">
+        <span>Select Month to Pay</span>
+        <select id="selectMonthDropdown" class="form-select" style="max-width: 180px; font-weight: 600;" onchange="onSelectedMonthChange()">
+          <!-- Populated dynamically -->
+        </select>
+      </h3>
+
+      <div class="upi-box" style="margin-top: 1.25rem;">
+        <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted);">SCAN WITH ANY UPI APP (GPAY, PHONEPE, PAYTM)</div>
+        <img id="directUpiQr" class="qr-image" src="" alt="UPI QR Code">
+        
+        <div style="font-size: 1.5rem; font-weight: 800; color: var(--text-main);" id="directPayAmountText">₹0</div>
+        <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;">
+          Paying for: <b id="directMonthLabel">-</b>
+        </div>
+        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">
+          UPI ID: <span id="directUpiIdText">-</span>
+        </div>
+
+        <div style="margin-top: 1.25rem;">
+          <a id="directGPayBtn" href="#" class="btn btn-gpay" style="width: 100%; font-size: 1.05rem;">
+            ⚡ Pay with GPay / UPI App
+          </a>
+        </div>
+      </div>
+
+      <!-- Payment confirmation form -->
+      <form onsubmit="submitPersonalPayment(event)">
+        <div class="form-group">
+          <label class="form-label">Payment Method Used</label>
+          <select id="personalPayMode" class="form-select">
+            <option value="Google Pay (GPay)">Google Pay (GPay)</option>
+            <option value="PhonePe">PhonePe</option>
+            <option value="Paytm / BHIM UPI">Paytm / BHIM UPI</option>
+            <option value="Bank Transfer (NEFT/IMPS)">Bank Transfer (NEFT/IMPS)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">UPI Reference / UTR Number (Optional)</label>
+          <input type="text" id="personalUtr" class="form-control" placeholder="12-digit UPI reference number">
+        </div>
+
+        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 0.75rem; border-radius: 8px; font-size: 0.8rem; color: #166534; margin-bottom: 1.25rem;">
+          📱 <b>Instant SMS confirmation:</b> Once submitted, an SMS receipt will immediately be sent to both your phone number and the tuition teacher's number.
+        </div>
+
+        <button type="submit" class="btn btn-success" style="width: 100%; font-size: 1rem; padding: 0.75rem;">
+          ✓ Mark as Paid & Dispatch SMS Notifications
+        </button>
+      </form>
+    </div>
+
+    <!-- 12-Month Chart for Parent's Records -->
+    <div class="card">
+      <h3 style="margin-bottom: 0.25rem;">Annual Fee Status Tracker (2026)</h3>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">Full year payment history for this student.</p>
+
+      <div class="fee-chart-grid" id="directChartGrid">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Hidden elements needed by script -->
+  <input type="hidden" id="pageStudentCode" value="{{ student_code }}">
+  <input type="hidden" id="pageTargetMonth" value="{{ target_month or '' }}">
+
+  <div id="toast" class="alert-toast" style="display: none;"></div>
+
+  <script src="/static/js/pay.js"></script>
+</body>
+</html>
+

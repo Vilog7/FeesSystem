@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+fees_system.db
+.env
+.vscode/

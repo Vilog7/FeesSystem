@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tuition Fee Management Portal</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="navbar">
+    <a href="/" class="brand">
+      <div class="brand-icon">₹</div>
+      <div>
+        <span id="navTuitionName">Bright Minds Academy</span>
+        <span style="font-size: 0.75rem; display: block; color: var(--text-muted); font-weight: 500;">Fees Management System</span>
+      </div>
+    </a>
+    <div class="user-status" id="authHeaderArea">
+      <!-- Injected dynamically by JS (Login btn or User Profile) -->
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- View: Guest / Auth Modal (Sign Up & Log In) -->
+    <div id="authSection" class="card" style="max-width: 480px; margin: 3rem auto; display: none;">
+      <div class="tabs">
+        <button class="tab-btn active" id="tabLoginBtn" onclick="switchAuthTab('login')">Log In</button>
+        <button class="tab-btn" id="tabSignupBtn" onclick="switchAuthTab('signup')">Sign Up</button>
+      </div>
+
+      <!-- Log In Form -->
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label class="form-label">Phone Number / Username</label>
+          <input type="text" id="loginUsername" class="form-control" placeholder="Enter phone number or 'teacher'" required autocomplete="username">
+          <small id="roleHint" style="font-size: 0.75rem; color: var(--accent); margin-top: 4px; display: block;"></small>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Log In</button>
+        <div style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted); text-align: center;">
+          Teacher login: <b>teacher</b> / <code>teacher123</code> | New Parent? Click <b>Sign Up</b> above.
+        </div>
+      </form>
+
+      <!-- Parent Sign Up Form -->
+      <form id="signupForm" style="display: none;" onsubmit="handleSignup(event)">
+        <div class="form-group">
+          <label class="form-label">Phone Number (Required for SMS receipts)</label>
+          <input type="tel" id="signupPhone" class="form-control" placeholder="10-digit mobile number" required pattern="[0-9]{10}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Student Name</label>
+          <input type="text" id="signupStudentName" class="form-control" placeholder="Child's full name" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Student School</label>
+          <input type="text" id="signupSchool" class="form-control" placeholder="e.g. St. Xavier's High School" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Student Class / Grade</label>
+          <input type="text" id="signupClass" class="form-control" placeholder="e.g. Class 10" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Create Password</label>
+          <input type="password" id="signupPassword" class="form-control" placeholder="Create a secure password" required minlength="4">
+        </div>
+        <button type="submit" class="btn btn-success" style="width: 100%;">Complete Sign Up</button>
+      </form>
+    </div>
+
+    <!-- View: Tuition Teacher Dashboard -->
+    <div id="teacherDashboard" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h2>Teacher Management Portal</h2>
+          <p style="color: var(--text-muted);">Manage schools, grades, student fee charts, and SMS alerts.</p>
+        </div>
+        <div style="display: flex; gap: 0.75rem;">
+          <button class="btn btn-outline" onclick="openSmsLogsModal()">📱 SMS History</button>
+          <button class="btn btn-outline" onclick="openSettingsModal()">⚙️ UPI & Settings</button>
+          <button class="btn btn-primary" onclick="openAddStudentModal()">+ Add New Student</button>
+        </div>
+      </div>
+
+      <!-- Quick Hierarchy Navigation: School -> Class -> Student -->
+      <div class="filter-bar">
+        <div>
+          <label class="form-label">1. Select School</label>
+          <select id="filterSchool" class="form-select" onchange="onSchoolChanged()">
+            <option value="">-- All Schools --</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">2. Select Class / Grade</label>
+          <select id="filterClass" class="form-select" onchange="onClassChanged()">
+            <option value="">-- All Classes --</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">3. Search Student</label>
+          <input type="text" id="filterSearch" class="form-control" placeholder="Search by name, roll, phone..." oninput="debounceLoadStudents()">
+        </div>
+      </div>
+
+      <!-- Students List View -->
+      <div class="card" id="studentsListCard">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h3 id="studentsCountHeader">Students (0)</h3>
+          <span style="font-size: 0.85rem; color: var(--text-muted);">Click "View Fee Chart" to see monthly paid/unpaid status</span>
+        </div>
+        <div style="overflow-x: auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Student Code</th>
+                <th>Student Name</th>
+                <th>School</th>
+                <th>Class</th>
+                <th>Monthly Fee</th>
+                <th>Parent Name & Phone</th>
+                <th>Personal Payment Link</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="studentsTableBody">
+              <!-- Loaded via JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Selected Student Fee Chart Section (Embed inside Teacher view) -->
+      <div id="teacherStudentDetailSection" style="display: none; margin-top: 2rem;">
+        <!-- Container rendered identically to parent view -->
+        <div id="teacherChartContainer"></div>
+      </div>
+    </div>
+
+    <!-- View: Parent Dashboard (Direct view of their child's Fee Chart) -->
+    <div id="parentDashboard" style="display: none;">
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h2 id="parentWelcomeTitle">Welcome, Parent</h2>
+            <p id="parentStudentSubtitle" style="color: var(--text-muted);">Child: Loading...</p>
+          </div>
+          <div id="parentPayButtonArea">
+            <!-- Quick Pay link button -->
+          </div>
+        </div>
+      </div>
+
+      <div id="parentChartContainer">
+        <!-- Monthly Fee Grid loaded here -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Universal Student Fee Chart Template (Rendered dynamically) -->
+  <template id="feeChartTemplate">
+    <div class="card">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h3 class="student-chart-name" style="font-size: 1.5rem; color: var(--primary);">Student Name</h3>
+          <p class="student-chart-meta" style="color: var(--text-muted); font-size: 0.9rem;">School • Class • Code</p>
+          <p class="student-chart-contact" style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem;">Parent Contact: -</p>
+        </div>
+        <div style="text-align: right;">
+          <span class="badge badge-teacher" style="font-size: 0.85rem;">Academic Year 2026</span>
+          <div style="margin-top: 0.5rem;">
+            <button class="btn btn-outline" style="font-size: 0.8rem;" onclick="copyPersonalLink()">🔗 Copy Personal Pay Link</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fee Statistics Overview Cards -->
+      <div class="stats-grid" style="margin-top: 1.5rem;">
+        <div class="stat-card">
+          <div class="stat-label">Monthly Fee</div>
+          <div class="stat-value chart-stat-monthly">₹0</div>
+        </div>
+        <div class="stat-card" style="border-left: 4px solid var(--success);">
+          <div class="stat-label">Months Paid</div>
+          <div class="stat-value chart-stat-paid" style="color: var(--success);">0 / 12</div>
+        </div>
+        <div class="stat-card" style="border-left: 4px solid var(--danger);">
+          <div class="stat-label">Months Due</div>
+          <div class="stat-value chart-stat-due" style="color: var(--danger);">0 / 12</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Amount Paid</div>
+          <div class="stat-value chart-stat-total-paid" style="color: var(--primary);">₹0</div>
+        </div>
+      </div>
+
+      <h4 style="margin: 1.5rem 0 0.5rem;">12-Month Fee Status Tracker</h4>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+        Green cards indicate fees paid with SMS confirmation sent. Red cards indicate pending fee for that month.
+      </p>
+
+      <!-- 12 Months Grid -->
+      <div class="fee-chart-grid chart-grid-container">
+        <!-- Injected dynamically -->
+      </div>
+    </div>
+  </template>
+
+  <!-- Modal: Direct Pay (UPI / GPay / Receipt) -->
+  <div id="paymentModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h3 id="payModalTitle">Pay Monthly Fee</h3>
+        <button class="btn btn-outline" style="padding: 0.25rem 0.6rem;" onclick="closeModal('paymentModal')">✕</button>
+      </div>
+
+      <div id="payModalStudentDetails" style="background: #f8fafc; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.9rem;">
+        <!-- Info -->
+      </div>
+
+      <!-- UPI QR Code & Direct Deep Link -->
+      <div class="upi-box">
+        <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted);">SCAN VIA GPAY / PHONEPE / PAYTM</span>
+        <img id="upiQrCodeImg" class="qr-image" src="" alt="UPI QR Code">
+        <div style="font-weight: 700; font-size: 1.25rem; color: var(--primary);" id="payModalAmountText">₹0</div>
+        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">UPI ID: <span id="payModalUpiId"></span></div>
+        
+        <div style="margin-top: 1.25rem;">
+          <a id="upiDeepLinkBtn" href="#" class="btn btn-gpay" style="width: 100%;">
+            ⚡ Pay with GPay / Any UPI App
+          </a>
+        </div>
+      </div>
+
+      <!-- Payment Confirmation & SMS Trigger -->
+      <form id="confirmPaymentForm" onsubmit="submitFeePayment(event)">
+        <input type="hidden" id="payStudentCode">
+        <input type="hidden" id="payMonthIndex">
+        
+        <div class="form-group">
+          <label class="form-label">Payment Mode</label>
+          <select id="payMode" class="form-select">
+            <option value="Google Pay (GPay)">Google Pay (GPay)</option>
+            <option value="PhonePe">PhonePe</option>
+            <option value="Paytm / BHIM UPI">Paytm / BHIM UPI</option>
+            <option value="Bank Transfer (NEFT/IMPS)">Bank Transfer (NEFT/IMPS)</option>
+            <option value="Cash">Cash</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">UPI Reference / UTR Number (Optional)</label>
+          <input type="text" id="payUtr" class="form-control" placeholder="12-digit UPI reference number">
+        </div>
+
+        <div style="background: #eff6ff; border: 1px solid #bfdbfe; padding: 0.75rem; border-radius: 8px; font-size: 0.8rem; color: #1e40af; margin-bottom: 1.25rem;">
+          🔔 <b>Automatic Dual SMS:</b> Clicking confirm will instantaneously mark the fee as PAID and dispatch SMS receipts to both parent and tuition teacher numbers.
+        </div>
+
+        <button type="submit" class="btn btn-success" style="width: 100%;">
+          ✓ Confirm Payment & Send SMS Receipts
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Add New Student -->
+  <div id="addStudentModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h3>Add New Student</h3>
+        <button class="btn btn-outline" style="padding: 0.25rem 0.6rem;" onclick="closeModal('addStudentModal')">✕</button>
+      </div>
+      <form onsubmit="submitNewStudent(event)">
+        <div class="form-group">
+          <label class="form-label">Student Full Name</label>
+          <input type="text" id="newStuName" class="form-control" required placeholder="e.g. Rahul Sharma">
+        </div>
+        <div class="form-group">
+          <label class="form-label">School</label>
+          <select id="newStuSchool" class="form-select" onchange="populateNewStudentClasses()" required>
+            <option value="">Select School</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Class / Grade</label>
+          <select id="newStuClass" class="form-select" required>
+            <option value="">Select Class</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Monthly Fee (₹)</label>
+          <input type="number" id="newStuFee" class="form-control" value="1500" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Parent's Name</label>
+          <input type="text" id="newStuParentName" class="form-control" required placeholder="e.g. Sunil Sharma">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Parent Mobile Number (For SMS receipts)</label>
+          <input type="tel" id="newStuParentPhone" class="form-control" required placeholder="10-digit mobile number">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Register Student & Generate Link</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: SMS Logs -->
+  <div id="smsLogsModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content" style="max-width: 680px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h3>📱 SMS Notification Logs (Parent & Teacher)</h3>
+        <button class="btn btn-outline" style="padding: 0.25rem 0.6rem;" onclick="closeModal('smsLogsModal')">✕</button>
+      </div>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+        Each time a fee payment is made via personal link, notifications are dispatched to both the parent's phone and teacher's phone.
+      </p>
+      <div style="max-height: 400px; overflow-y: auto;">
+        <table class="data-table" style="font-size: 0.85rem;">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Recipient</th>
+              <th>Type</th>
+              <th>SMS Message</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="smsLogsTableBody">
+            <!-- Populated via JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: System Settings (UPI & Teacher Phone) -->
+  <div id="settingsModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h3>Tuition & Payment Settings</h3>
+        <button class="btn btn-outline" style="padding: 0.25rem 0.6rem;" onclick="closeModal('settingsModal')">✕</button>
+      </div>
+      <form onsubmit="saveSettings(event)">
+        <div class="form-group">
+          <label class="form-label">Tuition / Academy Name</label>
+          <input type="text" id="settingTuitionName" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Teacher UPI ID (GPay / PhonePe / Paytm receiver)</label>
+          <input type="text" id="settingUpiId" class="form-control" placeholder="e.g. tuitionteacher@okaxis" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Teacher Phone Number (For SMS payment alerts)</label>
+          <input type="tel" id="settingTeacherPhone" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Save Settings</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast" class="alert-toast" style="display: none;"></div>
+
+  <script src="/static/js/main.js"></script>
+</body>
+</html>
+
