@@ -586,6 +586,10 @@ def manage_settings():
 def home():
     return render_template('index.html')
 
+@app.route('/developer')
+def developer_page():
+    return render_template('developer.html')
+
 @app.route('/pay/<student_code>')
 @app.route('/pay/<student_code>/<int:month_index>')
 def payment_page(student_code, month_index=None):
