@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tuition Fee Management Portal</title>
+  <title>Learnn Fees System</title>
   <link rel="stylesheet" href="/static/css/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,7 +16,7 @@
     <a href="/" class="brand">
       <div class="brand-icon">₹</div>
       <div>
-        <span id="navTuitionName">Bright Minds Academy</span>
+        <span id="navTuitionName">Learnn</span>
         <span style="font-size: 0.75rem; display: block; color: var(--text-muted); font-weight: 500;">Fees Management System</span>
       </div>
     </a>
@@ -47,7 +47,7 @@
       <form id="loginForm" onsubmit="handleLogin(event)">
         <div class="form-group">
           <label class="form-label">Phone Number / Username</label>
-          <input type="text" id="loginUsername" class="form-control" placeholder="Enter phone number or 'teacher'" required autocomplete="username">
+          <input type="text" id="loginUsername" class="form-control" placeholder="Enter phone number or username" required autocomplete="username">
           <small id="roleHint" style="font-size: 0.75rem; color: var(--accent); margin-top: 4px; display: block;"></small>
         </div>
         <div class="form-group">
@@ -56,7 +56,7 @@
         </div>
         <button type="submit" class="btn btn-primary" style="width: 100%;">Log In</button>
         <div style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted); text-align: center;">
-          Teacher login: <b>teacher</b> / <code>teacher123</code> | New Parent? Click <b>Sign Up</b> above.
+          New Parent? Click <b>Sign Up</b> above.
         </div>
       </form>
 

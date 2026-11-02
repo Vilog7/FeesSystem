@@ -1,6 +1,6 @@
-# Tuition Fee Management System
+# Learnn Fees System
 
-A fee management website with universal authentication, hierarchy filtering (School -> Class -> Student), personal payment pages with UPI/GPay links & dynamic QR codes, a 12-month visual fee status tracker, and dual SMS notifications.
+A secure fee management website with universal authentication, hierarchy filtering (School -> Class -> Student), personal payment pages with UPI/GPay links & dynamic QR codes, a 12-month visual fee status tracker, and dual SMS notifications.
 
 ---
 
@@ -22,7 +22,7 @@ A fee management website with universal authentication, hierarchy filtering (Sch
    - Pre-fills student ID and month in the transaction note.
 
 4. **12-Month Fee Status Tracker**:
-   - Color-coded monthly tracker (🟢 Paid vs 🔴 Unpaid).
+   - Color-coded monthly tracker (🟢 Paid vs 🟡 Pending).
    - Shows payment mode, receipt number, and payment date for paid months.
    - Real-time chart update upon payment.
    - Parents view their child's chart; the tuition teacher can browse any student's chart.
@@ -34,7 +34,7 @@ A fee management website with universal authentication, hierarchy filtering (Sch
    - SMS History audit log tab available directly inside the Teacher Portal.
 
 6. **Teacher Customization Portal**:
-   - Update Tuition/Academy Name.
+   - Update Tuition/Academy Name (Default: **Learnn**).
    - Update Teacher UPI ID (GPay / PhonePe receiver).
    - Update Teacher Phone Number for incoming SMS alerts.
    - Add new students and automatically generate their personal links.
@@ -51,15 +51,13 @@ python app.py
 
 ### 2. Access the Application
 - **Main Portal**: `http://localhost:5000`
-- **Student Personal Payment Link**: `http://localhost:5000/pay/STU1001`
+- **Developer Info**: `http://localhost:5000/developer`
 
 ---
 
-## 🔑 Login Credentials
+## 🔑 Login Access
 
-| Role | Username | Default Password | Notes |
-| :--- | :--- | :--- | :--- |
-| **Tuition Teacher (Admin)** | `teacher` | `teacher123` | Full access to add students, view fee charts, customize UPI, and view SMS logs |
-| **New Parents** | *Created during Sign Up* | *Parent chosen password* | Sign up with phone number and child's student code |
+- **Parents**: Sign up directly on the home page with your phone number and student details, then log in using your registered phone number and password.
+- **Teacher (Admin)**: Use your private administrator credentials to access the teacher management dashboard.
 
 

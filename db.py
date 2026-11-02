@@ -108,7 +108,7 @@ def init_db():
 
     # Seed initial default settings if empty
     default_settings = [
-        ('tuition_name', 'Bright Minds Tuition Academy'),
+        ('tuition_name', 'Learnn'),
         ('tuition_upi_id', 'tuitionteacher@upi'),
         ('teacher_phone', '9876543210'),
         ('current_year', '2026'),
