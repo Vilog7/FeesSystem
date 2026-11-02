@@ -276,7 +276,7 @@ function renderStudentsTable(students) {
   tbody.innerHTML = '';
 
   if (students.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 2.5rem; color: var(--text-muted);">No students registered yet. Click "+ Add New Student" or let parents sign up.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 2.5rem; color: var(--text-muted);">No students registered yet. Students will appear here automatically when parents sign up.</td></tr>`;
     return;
   }
 
